@@ -3,15 +3,14 @@ import React, { useState } from 'react';
 const API_URL = 'http://3.7.65.128:4000/api';
 
 function AdminApp() {
+  // All hooks at the top
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [token, setToken] = useState(localStorage.getItem('gpp_jwt') || '');
   const [error, setError] = useState('');
-
   // Types for dashboard data
   type School = { id: number; name: string; email: string; approved: boolean };
   type Analytics = { schools: number; textbooks: number; accessCodes: number };
-
   // Dashboard state
   const [schools, setSchools] = useState<School[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -23,8 +22,8 @@ function AdminApp() {
   const [textbookUrl, setTextbookUrl] = useState('');
   const [textbookResult, setTextbookResult] = useState('');
 
-  // Fetch schools and analytics on mount
   React.useEffect(() => {
+    if (!token) return;
     fetch(`${API_URL}/analytics`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json()).then(setAnalytics);
     fetch(`${API_URL}/schools`, { headers: { Authorization: `Bearer ${token}` } })
