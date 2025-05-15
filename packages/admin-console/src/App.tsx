@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_URL = 'https://super-duper-space-acorn-vxp4ppvjqvjcpqwp-4000.app.github.dev/' + 'api';
+const API_URL = 'http://3.7.65.128:4000/api';
 
 function AdminApp() {
   const [username, setUsername] = useState('');

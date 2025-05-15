@@ -2,6 +2,7 @@
 import express from 'express';
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+import fs from 'fs';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -12,7 +13,9 @@ app.use(cors({
     'https://super-duper-space-acorn-vxp4ppvjqvjcpqwp-3000.app.github.dev',
     'https://super-duper-space-acorn-vxp4ppvjqvjcpqwp-4000.app.github.dev',
     'http://localhost:3000',
-    'http://localhost:4000'
+    'http://localhost:4000',
+    'https://3.7.65.128:4000',
+    'http://3.7.65.128:4000'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
@@ -117,6 +120,7 @@ app.get('/api/analytics', authenticateJWT, (req, res) => {
   res.json({ schools: schools.length, textbooks: textbooks.length, accessCodes: accessCodes.length });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Listen on all interfaces (0.0.0.0) for HTTP
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`HTTP server running on http://0.0.0.0:${PORT} (accessible via http://3.7.65.128:${PORT})`);
 });
