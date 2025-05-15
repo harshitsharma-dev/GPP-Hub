@@ -15,7 +15,8 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:4000',
     'https://3.7.65.128:4000',
-    'http://3.7.65.128:4000'
+    'http://3.7.65.128:4000',
+    'http://3.7.65.128:3000' // <-- Added for local frontend
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
