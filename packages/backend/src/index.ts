@@ -16,13 +16,17 @@ app.use(cors({
     'http://localhost:4000',
     'https://3.7.65.128:4000',
     'http://3.7.65.128:4000',
-    'http://3.7.65.128:3000' // <-- Added for local frontend
+    'http://3.7.65.128:3000',
+    '*'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+
+// Add this to handle preflight requests for all routes
+app.options('*', cors());
 
 // Simple mock user DB
 const users = [
