@@ -8,6 +8,29 @@ function AdminApp() {
   const [token, setToken] = useState(localStorage.getItem('gpp_jwt') || '');
   const [error, setError] = useState('');
 
+  // Types for dashboard data
+  type School = { id: number; name: string; email: string; approved: boolean };
+  type Analytics = { schools: number; textbooks: number; accessCodes: number };
+
+  // Dashboard state
+  const [schools, setSchools] = useState<School[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [schoolName, setSchoolName] = useState('');
+  const [schoolEmail, setSchoolEmail] = useState('');
+  const [accessCodeSchoolId, setAccessCodeSchoolId] = useState('');
+  const [accessCode, setAccessCode] = useState('');
+  const [textbookTitle, setTextbookTitle] = useState('');
+  const [textbookUrl, setTextbookUrl] = useState('');
+  const [textbookResult, setTextbookResult] = useState('');
+
+  // Fetch schools and analytics on mount
+  React.useEffect(() => {
+    fetch(`${API_URL}/analytics`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json()).then(setAnalytics);
+    fetch(`${API_URL}/schools`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json()).then(setSchools);
+  }, [token]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -56,29 +79,6 @@ function AdminApp() {
       </div>
     );
   }
-
-  // Types for dashboard data
-  type School = { id: number; name: string; email: string; approved: boolean };
-  type Analytics = { schools: number; textbooks: number; accessCodes: number };
-
-  // Dashboard state
-  const [schools, setSchools] = useState<School[]>([]);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [schoolName, setSchoolName] = useState('');
-  const [schoolEmail, setSchoolEmail] = useState('');
-  const [accessCodeSchoolId, setAccessCodeSchoolId] = useState('');
-  const [accessCode, setAccessCode] = useState('');
-  const [textbookTitle, setTextbookTitle] = useState('');
-  const [textbookUrl, setTextbookUrl] = useState('');
-  const [textbookResult, setTextbookResult] = useState('');
-
-  // Fetch schools and analytics on mount
-  React.useEffect(() => {
-    fetch(`${API_URL}/analytics`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json()).then(setAnalytics);
-    fetch(`${API_URL}/schools`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json()).then(setSchools);
-  }, [token]);
 
   // Approve school
   const approveSchool = async (id: number) => {
