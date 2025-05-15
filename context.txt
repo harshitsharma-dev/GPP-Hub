@@ -1,0 +1,153 @@
+# Comprehensive Product Requirements Document for GPP Hub Platform  
+
+**The GPP Hub platform is a centralized digital solution for educational content distribution, designed to streamline textbook management, secure PDF access, and facilitate school-teacher collaboration. This PRD outlines technical specifications, user workflows, and system architecture for a scalable ed-tech platform serving schools in Faridabad, Haryana, with multilanguage support and robust access controls.**  
+
+---
+
+## 1. Project Scope & Objectives  
+
+### 1.1 Core Functionality  
+- **GPP Admin Console**: Manages school approvals, access code generation, textbook uploads, and analytics  
+- **School Portal**: Handles registration, access code requests, and teacher associations  
+- **Teacher Interface**: Provides DRM-protected textbook access, calendar integration, and search tools  
+
+### 1.2 Success Metrics  
+- 95% textbook access success rate within 2s load time [6][16]  
+-  400 * 1024 * 1024:
+        raise HTTPException(413, "File exceeds 400MB limit")
+    
+    s3_key = f"textbooks/{uuid4()}.pdf"
+    presigned_url = s3_client.generate_presigned_url(
+        'put_object',
+        Params={'Bucket': 'gpp-textbooks-prd', 'Key': s3_key},
+        ExpiresIn=3600
+    )
+    
+    await PDFValidator.check_malware(file)
+    await PDFProcessor.apply_drm(s3_key)
+    
+    return { "upload_url": presigned_url, "s3_key": s3_key }
+```
+
+### 5.2 Client-Side DRM Enforcement  
+```javascript
+PDFViewerApplicationOptions.set('disableAutoFetch', true);
+PDFViewerApplicationOptions.set('disableStream', true);
+PDFViewerApplicationOptions.set('disableRange', true);
+
+document.addEventListener('keydown', (e) => {
+  if(e.ctrlKey && (e.key === 's' || e.key === 'p')) e.preventDefault();
+});
+```
+
+---
+
+## 6. Calendar Integration  
+
+### 6.1 Google API Sequence  
+1. Teacher requests available slots  
+2. System queries Google Calendar API:  
+   ```javascript
+   calendar.freebusy.query({
+     timeMin: new Date().toISOString(),
+     timeMax: new Date(Date.now() + 604800000).toISOString(),
+     items: [{id: 'author@domain.com'}]
+   });
+   ```
+3. Display available slots in IST timezone  
+4. On booking confirmation:  
+   ```javascript
+   calendar.events.insert({
+     calendarId: 'primary',
+     resource: {
+       summary: 'Textbook Consultation',
+       start: { dateTime: '2024-03-15T14:30:00+05:30' },
+       end: { dateTime: '2024-03-15T15:00:00+05:30' },
+       attendees: [{ email: 'teacher@school.edu' }]
+     }
+   });
+   ```
+
+---
+
+## 7. Localization Strategy  
+
+### 7.1 Language Implementation  
+```json
+{
+  "en-IN": {
+    "welcome": "Welcome to GPP Hub",
+    "textbooks": "Digital Textbooks"
+  },
+  "hi-IN": {
+    "welcome": "जीपीपी हब में आपका स्वागत है",
+    "textbooks": "डिजिटल पाठ्यपुस्तकें"
+  }
+}
+```
+
+**Date Formatting**:  
+```javascript
+new Date().toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  dateStyle: 'short'
+}); // Output: 14/3/24
+```
+
+---
+
+## 8. Testing Protocols  
+
+### 8.1 Security Tests  
+| Test Case                  | Tool            | Acceptance Criteria            |
+|----------------------------|-----------------|---------------------------------|
+| PDF Injection              | OWASP ZAP       | 0 critical vulnerabilities      |
+| Brute Force Protection     | Kali Linux      | Account lock after 5 attempts   |
+| Session Hijacking           | Burp Suite      | JWT token rotation enforced     |
+
+### 8.2 Performance Benchmarks  
+```plaintext
+Load Test: 1000 concurrent PDF views
+- AWS t3.medium: 850ms avg response
+- 95th percentile: 1.2s
+- Error rate: <0.5%
+
+PDF Upload (400MB):
+- Transfer time: 68s (GCP CDN)
+- Processing time: 42s (Python worker)
+```
+
+---
+
+## 9. Deployment Pipeline  
+
+### 9.1 CI/CD Workflow  
+1. Code commit → GitHub Actions trigger  
+2. Run unit tests (Jest + Mocha)  
+3. Build Docker images:  
+   ```dockerfile
+   FROM node:18-alpine
+   WORKDIR /app
+   COPY package*.json ./
+   RUN npm ci --production
+   COPY . .
+   CMD ["node", "server.js"]
+   ```
+4. Deploy to AWS ECS (Blue/Green strategy)  
+5. Post-deployment smoke tests  
+
+---
+
+## 10. Maintenance Plan  
+
+### 10.1 Update Schedule  
+| Frequency   | Scope                          | Window               |
+|-------------|--------------------------------|----------------------|
+| Quarterly   | Security patches               | 2am-4am IST (Sunday) |
+| Biannual    | Feature releases               | March/September      |
+| Emergency   | Critical vulnerabilities       | Within 72h           |
+
+**Monitoring Stack**:  
+- Prometheus + Grafana for API metrics  
+- CloudWatch alarms for S3 bucket access  
+- Sentry for client-side error tracking  

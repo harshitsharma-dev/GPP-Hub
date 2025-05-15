@@ -1,0 +1,11 @@
+{
+  "name": "gpp-hub",
+  "private": true,
+  "workspaces": [
+    "packages/admin-console",
+    "packages/school-portal",
+    "packages/teacher-interface",
+    "packages/backend",
+    "packages/shared"
+  ]
+}
